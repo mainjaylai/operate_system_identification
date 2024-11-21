@@ -1,0 +1,5 @@
+*.pkl
+.venv
+.venv/
+.history/
+.history
