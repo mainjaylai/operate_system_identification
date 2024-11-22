@@ -145,17 +145,27 @@ class PcapFeatureExtractor:
                         flow_stats[f"tcp_{flag}"] += 1
                 continue
             if key == "tcp.options_timestamp_tsval":
-                mean, std = self.process_tcp_timestamp_diff(values)
-                flow_stats[f"{key}_mean"] = mean
-                flow_stats[f"{key}_std"] = std
+                if len(values) > 1:  # 确保至少有两个值才计算
+                    mean, std = self.process_tcp_timestamp_diff(values)
+                    flow_stats[f"{key}_mean"] = mean
+                    flow_stats[f"{key}_std"] = std
+                else:
+                    flow_stats[f"{key}_mean"] = float(values[0]) if values else 0
+                    flow_stats[f"{key}_std"] = 0
                 continue
 
             if key in self.statistic_cols:
-                values = list(map(float, values))
-                flow_stats[f"{key}_max"] = np.max(values)
-                flow_stats[f"{key}_min"] = np.min(values)
-                flow_stats[f"{key}_mean"] = np.mean(values)
-                flow_stats[f"{key}_std"] = np.std(values) if len(values) > 1 else 0
+                if values:  # 确保有值才进行计算
+                    values = list(map(float, values))
+                    flow_stats[f"{key}_max"] = np.max(values)
+                    flow_stats[f"{key}_min"] = np.min(values)
+                    flow_stats[f"{key}_mean"] = np.mean(values)
+                    flow_stats[f"{key}_std"] = np.std(values) if len(values) > 1 else 0
+                else:
+                    flow_stats[f"{key}_max"] = 0
+                    flow_stats[f"{key}_min"] = 0
+                    flow_stats[f"{key}_mean"] = 0
+                    flow_stats[f"{key}_std"] = 0
                 continue
             # 对于非数值型特征，保留第一个非空值
             flow_stats[key] = values[0]

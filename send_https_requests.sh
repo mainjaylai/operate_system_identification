@@ -74,13 +74,7 @@ sudo tcpdump -i any \
     -n \
     -s 0 \
     -v \
-    'tcp and (
-        tcp[tcpflags] & (tcp-syn|tcp-fin|tcp-rst) != 0 or
-        tcp[((tcp[12:1] & 0xf0) >> 2):1] = 0x16 or
-        tcp[((tcp[12:1] & 0xf0) >> 2):1] = 0x17 or
-        tcp[((tcp[12:1] & 0xf0) >> 2):1] = 0x14 or
-        tcp[((tcp[12:1] & 0xf0) >> 2):1] = 0x15
-    )'
+    'tcp'
 
 # 生成DNS流量
 echo "生成DNS流量..."

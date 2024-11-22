@@ -34,28 +34,12 @@ class FeatureProcessor:
         # 填充 DataFrame 中的 NaN 值为 0
         df = df.fillna(0)
 
-        features_to_normalize = [
-            "ip.len_max",
-            "ip.len_min",
-            "ip.len_mean",
-            "ip.len_std",
-            "ip.ttl_max",
-            "ip.ttl_min",
-            "ip.ttl_mean",
-            "ip.ttl_std",
-            "tcp.window_size_value_max",
-            "tcp.window_size_value_min",
-            "tcp.window_size_value_mean",
-            "tcp.window_size_value_std",
-            "tcp.options_timestamp_tsval_mean",
-            "tcp.options_timestamp_tsval_std",
-        ]
+        # 获取所有数值列进行归一化
+        features_to_normalize = df.select_dtypes(include=[float, int]).columns
 
         if fit:
             self.scaler = MinMaxScaler()
-            df[features_to_normalize] = self.scaler.fit_transform(
-                df[features_to_normalize]
-            )
+            df[features_to_normalize] = self.scaler.fit_transform(df[features_to_normalize])
             joblib.dump(self.scaler, self.scaler_file)
             logger.info("特征归一化处理完成并保存缩放器")
         else:
@@ -95,7 +79,7 @@ class FeatureProcessor:
 def main():
     feature_dir = "feature_files"
     all_train_dfs = []  # 用于存储所有的训练集 DataFrame
-    all_test_dfs = []   # 用于存储所有的测试集 DataFrame
+    all_test_dfs = []  # 用于存储所有的测试集 DataFrame
 
     for filename in os.listdir(feature_dir):
         if filename.endswith(".csv"):
@@ -118,15 +102,20 @@ def main():
         combined_test_df = pd.concat(all_test_dfs, ignore_index=True)
 
         # 打乱合并后的训练集和测试集
-        combined_train_df = combined_train_df.sample(frac=1, random_state=42).reset_index(drop=True)
-        combined_test_df = combined_test_df.sample(frac=1, random_state=42).reset_index(drop=True)
+        combined_train_df = combined_train_df.sample(
+            frac=1, random_state=42
+        ).reset_index(drop=True)
+        combined_test_df = combined_test_df.sample(frac=1, random_state=42).reset_index(
+            drop=True
+        )
 
         logger.info("所有特征文件的训练集和测试集已合并并打乱")
 
         # 保存训练集和测试集
-        combined_train_df.to_csv(os.path.join(feature_dir, "combined_train.csv"), index=False)
-        combined_test_df.to_csv(os.path.join(feature_dir, "combined_test.csv"), index=False)
+        combined_train_df.to_csv("combined_train.csv", index=False)
+        combined_test_df.to_csv("combined_test.csv", index=False)
         logger.info("合并后的训练集和测试集已保存")
+
 
 if __name__ == "__main__":
     main()

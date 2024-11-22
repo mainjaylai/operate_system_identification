@@ -30,7 +30,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test):
     """训练模型并评估"""
     # 定义各个模型
     knn = KNeighborsClassifier(n_neighbors=5)
-    svm = SVC(probability=True, decision_function_shape='ovr')
+    svm = SVC(probability=True, decision_function_shape="ovr")
     rf = RandomForestClassifier(n_estimators=100, random_state=42)
     lr = LogisticRegression(max_iter=1000)
 
@@ -59,8 +59,8 @@ def train_and_evaluate(X_train, y_train, X_test, y_test):
 
 
 def main():
-    train_file = "feature_files/combined_train.csv"
-    test_file = "feature_files/combined_test.csv"
+    train_file = "combined_train.csv"
+    test_file = "combined_test.csv"
 
     train_df, test_df = load_data(train_file, test_file)
     X_train, y_train, X_test, y_test = preprocess_data(train_df, test_df)
