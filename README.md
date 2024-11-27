@@ -8,7 +8,7 @@
 
 - 自动生成多种类型的网络流量数据
 - 提取 PCAP 文件中的网络流量特征
-- 支持多种操作系统的识别（CentOS、Ubuntu、Debian）
+- 支持多种操作系统的识别（CentOS、Ubuntu、Debian、Windows、macOS）
 - 使用机器学习模型进行操作系统分类
 - 集成多个分类器提高识别准确率
 
@@ -20,6 +20,7 @@ project/
 ├── pcap_extractor.py # PCAP 文件特征提取
 ├── process_features.py # 特征处理和数据预处理
 ├── model_training.py # 模型训练和评估
+├── predict.py # 使用训练好的模型进行预测
 ├── feature_files/ # 特征文件存储目录
 └── pcap_files/ # PCAP 文件存储目录
 ```
@@ -73,6 +74,12 @@ python process_features.py
 
 ```bash
 python model_training.py
+```
+
+5. 使用模型进行预测：
+
+```bash
+python predict.py --pcap <path_to_pcap_file> --model <path_to_model_file>
 ```
 
 ## 特征说明

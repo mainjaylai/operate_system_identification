@@ -6,7 +6,7 @@ This is an operating system fingerprinting system based on network traffic analy
 
 - Automatically generate various types of network traffic data
 - Extract network traffic features from PCAP files
-- Support identification of multiple operating systems (CentOS, Ubuntu, Debian)
+- Support identification of multiple operating systems (CentOS, Ubuntu, Debian, Windows, macOS)
 - Use machine learning models for operating system classification
 - Integrate multiple classifiers to improve recognition accuracy
 
@@ -18,6 +18,7 @@ project/
 ├── pcap_extractor.py # PCAP file feature extraction
 ├── process_features.py # Feature processing and data preprocessing
 ├── model_training.py # Model training and evaluation
+├── predict.py # Use the trained model for prediction
 ├── feature_files/ # Directory for storing feature files
 └── pcap_files/ # Directory for storing PCAP files
 ```
@@ -71,6 +72,12 @@ python process_features.py
 
 ```bash
 python model_training.py
+```
+
+5. Use the model for prediction:
+
+```bash
+python predict.py --pcap <path_to_pcap_file> --model <path_to_model_file>
 ```
 
 ## Feature Description
