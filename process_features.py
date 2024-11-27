@@ -30,7 +30,11 @@ class FeatureProcessor:
         if df is None:
             logger.error("数据框为空，无法进行归一化")
             return None
-
+            
+        # 保存 label 列
+        label = df['label'] if 'label' in df.columns else None
+        
+        df = df.drop(columns=["flow_key", "label"], errors="ignore")
         # 填充 DataFrame 中的 NaN 值为 0
         df = df.fillna(0)
 
@@ -50,6 +54,10 @@ class FeatureProcessor:
                 logger.info("加载缩放器完成")
             df[features_to_normalize] = self.scaler.transform(df[features_to_normalize])
             logger.info("特征归一化处理完成")
+
+        # 将 label 加回 DataFrame
+        if label is not None:
+            df['label'] = label
 
         return df
 
@@ -73,19 +81,18 @@ class FeatureProcessor:
         logger.info(f"数据标注完成，标签为: {label}")
         return df
 
-    def split_data(self, df):
-        """将数据分为训练集和测试集"""
-        df = df.drop(columns=["flow_key"], errors="ignore")
-
-        train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
-        logger.info("数据分割完成: 训练集和测试集")
+    def split_data_stratified(self, df):
+        """将数据分为训练集和测试集，保持每个标签的比例一致"""
+        train_df, test_df = train_test_split(
+            df, test_size=0.2, random_state=42, stratify=df["label"]
+        )
+        logger.info("数据分割完成: 训练集和测试集，保持标签比例一致")
         return train_df, test_df
 
 
 def main():
     feature_dir = "feature_files"
-    all_train_dfs = []  # 用于存储所有的训练集 DataFrame
-    all_test_dfs = []  # 用于存储所有的测试集 DataFrame
+    all_dfs = []  # 用于存储所有的 DataFrame
 
     for filename in os.listdir(feature_dir):
         if filename.endswith(".csv"):
@@ -94,32 +101,29 @@ def main():
             df = processor.load_features()
 
             if df is not None:
-                df = processor.normalize_features(df, fit=True)
-                df = processor.label_data(df)
+                df = processor.label_data(df)  # 先标注数据
+                all_dfs.append(df)
 
-                # 分割每个文件为训练集和测试集
-                train_df, test_df = processor.split_data(df)
-                all_train_dfs.append(train_df)
-                all_test_dfs.append(test_df)
+    # 合并所有的数据
+    if all_dfs:
+        combined_df = pd.concat(all_dfs, ignore_index=True)
 
-    # 合并所有的训练集和测试集
-    if all_train_dfs and all_test_dfs:
-        combined_train_df = pd.concat(all_train_dfs, ignore_index=True)
-        combined_test_df = pd.concat(all_test_dfs, ignore_index=True)
+        # 对合并后的数据进行归一化处理
+        processor = FeatureProcessor("")  # 不需要特定文件名
+        combined_df = processor.normalize_features(combined_df, fit=True)
 
-        # 打乱合并后的训练集和测试集
-        combined_train_df = combined_train_df.sample(
-            frac=1, random_state=42
-        ).reset_index(drop=True)
-        combined_test_df = combined_test_df.sample(frac=1, random_state=42).reset_index(
-            drop=True
-        )
+        # 分割合并后的数据为训练集和测试集，保持标签比例一致
+        train_df, test_df = processor.split_data_stratified(combined_df)
 
-        logger.info("所有特征文件的训练集和测试集已合并并打乱")
+        # 打乱训练集和测试集
+        train_df = train_df.sample(frac=1, random_state=42).reset_index(drop=True)
+        test_df = test_df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+        logger.info("所有特征文件的数据已合并、归一化并打乱")
 
         # 保存训练集和测试集
-        combined_train_df.to_csv("combined_train.csv", index=False)
-        combined_test_df.to_csv("combined_test.csv", index=False)
+        train_df.to_csv("combined_train.csv", index=False)
+        test_df.to_csv("combined_test.csv", index=False)
         logger.info("合并后的训练集和测试集已保存")
 
 

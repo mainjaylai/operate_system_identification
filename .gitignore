@@ -1,4 +1,3 @@
-*.pkl
 .venv
 .venv/
 .history/

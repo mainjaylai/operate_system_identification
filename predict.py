@@ -37,7 +37,7 @@ class PcapPredictor:
         Args:
             pcap_file: pcap文件路径
         Returns:
-            预测结果
+            预测结果和每个类别的概率
         """
         try:
             # 提取pcap特征
@@ -75,7 +75,13 @@ def main():
     logger.info("预测结果:")
     for i, (pred, prob) in enumerate(zip(predictions, probabilities)):
         os_name = predictor.labels.get(pred, f"未知类别({pred})")
-        logger.info(f"流量 {i+1}: 操作系统 = {os_name}, 置信度 = {max(prob):.3f}")
+        logger.info(f"\n流量 {i+1}:")
+        logger.info(f"预测的操作系统: {os_name}")
+        logger.info("各操作系统的概率分布:")
+        for j, probability in enumerate(prob):
+            os_label = predictor.labels.get(j, f"未知类别({j})")
+            logger.info(f"- {os_label}: {probability:.3f}")
+        logger.info("-" * 50)
 
 
 if __name__ == "__main__":
