@@ -39,7 +39,9 @@ class FeatureProcessor:
 
         if fit:
             self.scaler = MinMaxScaler()
-            df[features_to_normalize] = self.scaler.fit_transform(df[features_to_normalize])
+            df[features_to_normalize] = self.scaler.fit_transform(
+                df[features_to_normalize]
+            )
             joblib.dump(self.scaler, self.scaler_file)
             logger.info("特征归一化处理完成并保存缩放器")
         else:
@@ -60,6 +62,10 @@ class FeatureProcessor:
             label = 1
         elif "debian" in filename:
             label = 2
+        elif "windows" in filename:
+            label = 3
+        elif "macos" in filename:
+            label = 4
         else:
             label = -1
 

@@ -12,7 +12,6 @@ class PcapFeatureExtractor:
 
     def __init__(self):
         self.statistic_cols = ["ip.len", "ip.ttl", "tcp.window_size_value"]
-        self.tcp_flags = ["URG", "ACK", "PSH", "RST", "SYN", "FIN"]
 
     def process_tcp_timestamp_diff(self, tcp_timestamp_list):
         tcp_timestamp_list = np.array(tcp_timestamp_list).astype(float)
@@ -81,20 +80,20 @@ class PcapFeatureExtractor:
 
         # IP相关特征
         ip_fields = [
-            "ip.dsfield_dscp",
-            "ip.dsfield_ecn",
             "ip.flags_df",
-            "ip.frag_offset",
             "ip.ttl",
-            "ip.proto",
             "ip.len",
+            # "ip.dsfield_dscp",
+            # "ip.frag_offset",
+            # "ip.proto",
+            # "ip.dsfield_ecn",
         ]
 
         # TCP相关特征
         tcp_fields = [
             "tcp.flags",
-            "tcp.options_timestamp_tsval",
             "tcp.window_size_value",
+            "tcp.options_timestamp_tsval",
         ]
 
         # 提取所有特征
@@ -120,7 +119,6 @@ class PcapFeatureExtractor:
 
         # 对流特征进行统计
         flow_stats = {
-            "tcp_URG": 0,
             "tcp_ACK": 0,
             "tcp_PSH": 0,
             "tcp_RST": 0,
@@ -142,6 +140,8 @@ class PcapFeatureExtractor:
                 for v in values:
                     active_flags = self.parse_tcp_flags(int(v, 16))
                     for flag in active_flags:
+                        if flag == "URG":
+                            continue
                         flow_stats[f"tcp_{flag}"] += 1
                 continue
             if key == "tcp.options_timestamp_tsval":
