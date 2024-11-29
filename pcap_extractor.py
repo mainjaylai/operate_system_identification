@@ -197,7 +197,7 @@ class PcapFeatureExtractor:
     def extract_and_process(self, pcap_dir):
         """提取和处理所有PCAP文件的特征，并将每个PCAP文件的特征单独存储到CSV文件中"""
         for filename in os.listdir(pcap_dir):
-            if filename.endswith(".pcap"):
+            if filename.endswith(".pcap") or filename.endswith(".pcapng"):
                 pcap_path = os.path.join(pcap_dir, filename)
                 logger.info(f"处理文件: {pcap_path}")
 

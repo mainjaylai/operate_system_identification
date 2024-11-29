@@ -42,7 +42,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test):
     # 训练模型
     voting_clf.fit(X_train, y_train)
     # 评估模型
-    y_pred = voting_clf.predict(X_test)
+    y_pred = voting_clf.predict(X_test.to_numpy())
     accuracy = accuracy_score(y_test, y_pred)
     print(f"\n使用选定特征的集成模型准确率: {accuracy:.2f}")
 
