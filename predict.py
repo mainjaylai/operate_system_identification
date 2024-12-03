@@ -4,6 +4,7 @@ from process_features import FeatureProcessor
 import joblib
 import logging
 import pandas as pd
+from sklearn.ensemble import VotingClassifier
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,7 +17,9 @@ class PcapPredictor:
             model_path: 训练好的模型文件路径
             scaler_path: 特征缩放器文件路径
         """
+        # 使用 joblib 加载模型
         self.model = joblib.load(model_path)
+
         self.pcap_extractor = PcapFeatureExtractor()
         self.feature_processor = FeatureProcessor(
             csv_file=None, scaler_file=scaler_path

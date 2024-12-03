@@ -93,7 +93,7 @@ class PcapFeatureExtractor:
         tcp_fields = [
             "tcp.flags",
             "tcp.window_size_value",
-            "tcp.options_timestamp_tsval",
+            # "tcp.options_timestamp_tsval",
         ]
 
         # 提取所有特征
