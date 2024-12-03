@@ -5,20 +5,32 @@ import joblib
 import logging
 import pandas as pd
 from sklearn.ensemble import VotingClassifier
+import os
+import sys
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class PcapPredictor:
-    def __init__(self, model_path, scaler_path="scaler.pkl"):
+    def __init__(self, model_path="voting_classifier.pkl", scaler_path="scaler.pkl"):
         """初始化预测器
         Args:
             model_path: 训练好的模型文件路径
             scaler_path: 特征缩放器文件路径
         """
+        # 获取打包后的临时目录路径
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+
+        model_path = os.path.join(base_path, model_path)
+        scaler_path = os.path.join(base_path, scaler_path)
+
         # 使用 joblib 加载模型
         self.model = joblib.load(model_path)
+        self.scaler = joblib.load(scaler_path)
 
         self.pcap_extractor = PcapFeatureExtractor()
         self.feature_processor = FeatureProcessor(
