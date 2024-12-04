@@ -4,7 +4,7 @@ block_cipher = None
 
 a = Analysis(
     ['predict.py'],
-    pathex=[],
+    pathex=['/usr/local/lib'],  # 添加共享库路径
     binaries=[],
     datas=[
         ('voting_classifier.pkl', '.'),  # 将 voting_classifier.pkl 包含在打包中
@@ -46,7 +46,7 @@ coll = COLLECT(
     a.zipfiles,
     a.datas,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     name='predict',
 )
