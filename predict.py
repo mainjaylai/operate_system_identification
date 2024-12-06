@@ -20,7 +20,7 @@ class PcapPredictor:
             scaler_path: 特征缩放器文件路径
         """
         # 获取打包后的临时目录路径
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             base_path = sys._MEIPASS
         else:
             base_path = os.path.abspath(".")
@@ -92,10 +92,10 @@ def main():
         os_name = predictor.labels.get(pred, f"未知类别({pred})")
         logger.info(f"\n流量 {i+1}:")
         logger.info(f"预测的操作系统: {os_name}")
-        logger.info("各操作系统的概率分布:")
-        for j, probability in enumerate(prob):
-            os_label = predictor.labels.get(j, f"未知类别({j})")
-            logger.info(f"- {os_label}: {probability:.3f}")
+        # logger.info("各操作系统的概率分布:")
+        # for j, probability in enumerate(prob):
+        #     os_label = predictor.labels.get(j, f"未知类别({j})")
+        #     logger.info(f"- {os_label}: {probability:.3f}")
         logger.info("-" * 50)
 
 
