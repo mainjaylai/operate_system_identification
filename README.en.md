@@ -103,6 +103,10 @@ Uses ensemble learning methods, including the following classifiers:
 2. Ensure sufficient disk space to store PCAP files
 3. It is recommended to run the traffic generation script in a test environment
 
+## File Download
+
+Required files can be downloaded from the following link: [Google Drive](https://drive.google.com/drive/folders/1JDthSZJlkorWXAPdICTXd7PGNyvbqntV?usp=drive_link)
+
 ## License
 
 MIT License

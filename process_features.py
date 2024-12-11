@@ -42,35 +42,46 @@ class FeatureProcessor:
         # 获取需要进行 Min-Max 归一化的特征
         min_max_features = ["tcp_ACK", "tcp_PSH", "tcp_RST", "tcp_SYN", "tcp_FIN"]
         # 获取需要进行 Z-Score 归一化的特征
-        z_score_features = ["ip.ttl_max", "ip.ttl_min", "ip.ttl_mean", "ip.ttl_std", 
-                            "ip.len_max", "ip.len_min", "ip.len_mean", "ip.len_std"]
+        z_score_features = [
+            "ip.ttl_max",
+            "ip.ttl_min",
+            "ip.ttl_mean",
+            "ip.ttl_std",
+            "ip.len_max",
+            "ip.len_min",
+            "ip.len_mean",
+            "ip.len_std",
+        ]
         # 获取需要进行 Log 变换的特征
-        log_transform_features = ["tcp.window_size_value_max", "tcp.window_size_value_min", 
-                                  "tcp.window_size_value_mean", "tcp.window_size_value_std"]
+        log_transform_features = [
+            "tcp.window_size_value_max",
+            "tcp.window_size_value_min",
+            "tcp.window_size_value_mean",
+            "tcp.window_size_value_std",
+        ]
 
-        # try:
-        #     if fit:
-        #         # Min-Max 归一化
-        #         self.scaler = MinMaxScaler()
-        #         df[min_max_features] = self.scaler.fit_transform(df[min_max_features])
-        #         # Z-Score 归一化
-        #         df[z_score_features] = (df[z_score_features] - df[z_score_features].mean()) / df[z_score_features].std()
-        #         # Log 变换
-        #         df[log_transform_features] = df[log_transform_features].map(np.log1p)
-                
-        #         joblib.dump(self.scaler, self.scaler_file)
-        #         logger.info("特征归一化处理完成并保存缩放器")
-        #     else:
-        #         if self.scaler is None:
-        #             self.scaler = joblib.load(self.scaler_file)
-        #             logger.info("加载缩放器完成")
-        #         df[min_max_features] = self.scaler.transform(df[min_max_features])
-        #         df[z_score_features] = (df[z_score_features] - df[z_score_features].mean()) / df[z_score_features].std()
-        #         df[log_transform_features] = df[log_transform_features].map(np.log1p)
-        #         logger.info("特征归一化处理完成")
-        # except ValueError as e:
-        #     logger.info(f"归一化处理失败：{str(e)}")
-        #     return df
+        features_to_normalize = df.select_dtypes(include=[float, int]).columns
+
+        try:
+            if fit:
+                self.scaler = MinMaxScaler()
+                df[features_to_normalize] = self.scaler.fit_transform(
+                    df[features_to_normalize]
+                )
+                joblib.dump(self.scaler, self.scaler_file)
+                logger.info("特征归一化处理完成并保存缩放器")
+            else:
+                if self.scaler is None:
+                    self.scaler = joblib.load(self.scaler_file)
+                    logger.info("加载缩放器完成")
+                df[features_to_normalize] = self.scaler.transform(
+                    df[features_to_normalize]
+                )
+                logger.info("特征归一化处理完成")
+
+        except ValueError as e:
+            logger.info(f"归一化处理失败：{str(e)}")
+            return df
 
         # 将 label 加回 DataFrame
         if label is not None:

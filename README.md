@@ -105,6 +105,10 @@ python predict.py --pcap <path_to_pcap_file> --model <path_to_model_file>
 2. 确保有足够的磁盘空间存储 PCAP 文件
 3. 建议在测试环境中运行流量生成脚本
 
+## 文件下载
+
+需要的文件可以从以下链接下载：[Google Drive](https://drive.google.com/drive/folders/1JDthSZJlkorWXAPdICTXd7PGNyvbqntV?usp=drive_link)
+
 ## 许可证
 
 MIT License

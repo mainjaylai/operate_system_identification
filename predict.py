@@ -19,15 +19,7 @@ class PcapPredictor:
             model_path: 训练好的模型文件路径
             scaler_path: 特征缩放器文件路径
         """
-        # 获取打包后的临时目录路径
-        if getattr(sys, "frozen", False):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.path.abspath(".")
-
-        model_path = os.path.join(base_path, model_path)
-        scaler_path = os.path.join(base_path, scaler_path)
-
+        
         # 使用 joblib 加载模型
         self.model = joblib.load(model_path)
         self.scaler = joblib.load(scaler_path)
