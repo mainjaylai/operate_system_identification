@@ -62,26 +62,26 @@ class FeatureProcessor:
 
         features_to_normalize = df.select_dtypes(include=[float, int]).columns
 
-        try:
-            if fit:
-                self.scaler = MinMaxScaler()
-                df[features_to_normalize] = self.scaler.fit_transform(
-                    df[features_to_normalize]
-                )
-                joblib.dump(self.scaler, self.scaler_file)
-                logger.info("特征归一化处理完成并保存缩放器")
-            else:
-                if self.scaler is None:
-                    self.scaler = joblib.load(self.scaler_file)
-                    logger.info("加载缩放器完成")
-                df[features_to_normalize] = self.scaler.transform(
-                    df[features_to_normalize]
-                )
-                logger.info("特征归一化处理完成")
+        # try:
+        #     if fit:
+        #         self.scaler = MinMaxScaler()
+        #         df[features_to_normalize] = self.scaler.fit_transform(
+        #             df[features_to_normalize]
+        #         )
+        #         joblib.dump(self.scaler, self.scaler_file)
+        #         logger.info("特征归一化处理完成并保存缩放器")
+        #     else:
+        #         if self.scaler is None:
+        #             self.scaler = joblib.load(self.scaler_file)
+        #             logger.info("加载缩放器完成")
+        #         df[features_to_normalize] = self.scaler.transform(
+        #             df[features_to_normalize]
+        #         )
+        #         logger.info("特征归一化处理完成")
 
-        except ValueError as e:
-            logger.info(f"归一化处理失败：{str(e)}")
-            return df
+        # except ValueError as e:
+        #     logger.info(f"归一化处理失败：{str(e)}")
+        #     return df
 
         # 将 label 加回 DataFrame
         if label is not None:
