@@ -8,6 +8,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_recall_fscore_support, ConfusionMatrixDisplay
 import joblib
 import matplotlib.pyplot as plt
+import numpy as np
+from pybaobabdt import pybaobabdt
+
 
 plt.rcParams["font.sans-serif"] = ["SimHei"]
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
@@ -30,24 +33,14 @@ def preprocess_data(train_df, test_df):
     return X_train, y_train, X_test, y_test
 
 
-def plot_metrics(history, y_test, y_pred, voting_clf, X_test):
+def plot_metrics(y_test, y_pred, voting_clf, X_test):
     """绘制模型评估指标"""
-    # 绘制损失曲线
-    plt.figure(figsize=(12, 6))
-    plt.plot(history['train_loss'], label='训练损失')
-    plt.plot(history['test_loss'], label='测试损失')
-    plt.title('损失曲线')
-    plt.xlabel('迭代次数')
-    plt.ylabel('损失')
-    plt.legend()
-    plt.savefig('loss_curve.png')  # 保存损失曲线
-    plt.show()
 
     # 计算并绘制其他指标
     precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average='weighted')
     accuracy = accuracy_score(y_test, y_pred)
 
-    metrics = {'准确率': accuracy, '精确率': precision, '召回率': recall, 'F1值': f1}
+    metrics = {'准确率': accuracy, '精确率': precision, '��回率': recall, 'F1值': f1}
     plt.figure(figsize=(8, 6))
     bars = plt.bar(metrics.keys(), metrics.values())
     plt.title('模型评估指标')
@@ -68,6 +61,21 @@ def plot_metrics(history, y_test, y_pred, voting_clf, X_test):
     plt.show()
 
 
+def plot_feature_importance(rf, feature_names):
+    """绘制特征重要性"""
+    importances = rf.feature_importances_
+    indices = np.argsort(importances)[::-1]
+
+    plt.figure(figsize=(10, 6))
+    plt.title("特征重要性")
+    plt.bar(range(len(importances)), importances[indices], align="center")
+    plt.xticks(range(len(importances)), [feature_names[i] for i in indices], rotation=90)
+    plt.xlim([-1, len(importances)])
+    plt.tight_layout()
+    plt.savefig('feature_importance.png')  # 保存特征重要性图
+    plt.show()
+
+
 def train_and_evaluate(X_train, y_train, X_test, y_test):
     """训练模型并评估"""
     # 定义各个模型
@@ -81,8 +89,9 @@ def train_and_evaluate(X_train, y_train, X_test, y_test):
         estimators=[("knn", knn), ("svm", svm), ("rf", rf), ("lr", lr)], voting="soft"
     )
 
-    # 训练模型
+    # 训练投票分类器
     voting_clf.fit(X_train, y_train)
+
     # 评估模型
     y_pred = voting_clf.predict(X_test.to_numpy())
     accuracy = accuracy_score(y_test, y_pred)
@@ -99,7 +108,13 @@ def train_and_evaluate(X_train, y_train, X_test, y_test):
     print("模型已保存为 voting_classifier.pkl")
 
     # 绘制评估指标
-    plot_metrics({'train_loss': [], 'test_loss': []}, y_test, y_pred, voting_clf, X_test)
+    plot_metrics(y_test, y_pred, voting_clf, X_test)
+
+    # 绘制随机森林特征重要性
+    plot_feature_importance(voting_clf.named_estimators_['rf'], X_train.columns)
+
+    pybaobabdt.draw_decision_tree(voting_clf.named_estimators_['rf'], feature_names=X_train.columns, class_names=y_train.unique())
+
 
 
 def main():
